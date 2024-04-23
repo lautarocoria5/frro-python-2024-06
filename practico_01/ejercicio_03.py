@@ -13,7 +13,15 @@ def operacion_basica(a: float, b: float, multiplicar: bool) -> Union[float, str]
         - Utilizar un único return.
         - No utilizar AND ni OR.
     """
-    pass # Completar
+    try:
+        if multiplicar == True:
+            valor=a*b
+        else:
+            multiplicar == False
+            valor=a/b
+    except ZeroDivisionError:
+        valor="Operación no válida"
+    return valor
 
 
 # NO MODIFICAR - INICIO
@@ -34,6 +42,15 @@ assert operacion_basica(1, 0, False) == "Operación no válida"
 def operacion_multiple(a: float, b: float, multiplicar: bool) -> Union[float, str]:
     """Re-Escribir utilizando tres returns."""
     pass # Completar
+    
+    try:
+        if multiplicar == True:
+            return a*b
+        else:
+            multiplicar == False
+            return a/b
+    except ZeroDivisionError:
+        return "Operación no válida"
 
 
 # NO MODIFICAR - INICIO
