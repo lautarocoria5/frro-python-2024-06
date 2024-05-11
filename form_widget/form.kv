@@ -1,0 +1,78 @@
+ScreenManager:
+    Pantalla1:
+        name: "pantalla1"
+    Pantalla2:
+        name: "pantalla2"
+
+<Pantalla1>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: "20dp"
+        spacing: "10dp"
+
+        Image:
+            source: "UTN_logo.jpg"
+            size_hint_y: None
+            height: "150dp"
+
+        Label:
+            text: "Formulario de ingreso."
+            bold: True
+            font_size: "22dp"
+
+        TextInput:
+            id: nombre
+            hint_text: "Nombre"
+            font_size: "16sp"
+            padding: "10dp"
+            multiline: False
+            on_text: root.update_progress_bar()
+
+
+        TextInput:
+            id: apellido
+            hint_text: "Apellido"
+            font_size: "16sp"
+            padding: "10dp"
+            multiline: False
+            on_text: root.update_progress_bar()
+
+
+        TextInput:
+            id: email
+            hint_text: "Email"
+            font_size: "16sp"
+            padding: "10dp"
+            multiline: False
+            on_text: 
+                root.update_progress_bar()
+                root.validate_email(self.text)
+
+
+        TextInput:
+            id: contra
+            hint_text: "Contraseña"
+            font_size: "16sp"
+            padding: "10dp"
+            multiline: False
+            password: True
+            on_text: root.update_progress_bar()
+
+        ProgressBar:
+            id: pb
+            value: 0
+            max: 1
+            size_hint_y: None
+            height: "48dp"
+
+        Button:
+            text: "Ingresar"
+            on_press: root.manager.current = "pantalla2"
+            size_hint: (0.6, None)
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            height: "40dp"
+            disabled: True if not (nombre.text and apellido.text and email.text and contra.text) else False
+
+<Pantalla2>:
+    BoxLayout:
+        orientation: "vertical"
