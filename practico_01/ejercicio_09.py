@@ -6,6 +6,10 @@ def sumatoria_basico(n: int) -> int:
 
     Restricción: Utilizar un bucle for.
     """
+    suma = 0
+    for i in range(1, n + 1):
+        suma += i
+    return suma
     pass # Completar
 
 
@@ -22,6 +26,7 @@ def sumatoria_sum(n: int) -> int:
     """Re-Escribir utilizando la función sum y sin usar bucles.
     Referencia: https://docs.python.org/3/library/functions.html#sum
     """
+    return sum(range(1,n+1))
     pass # Completar
 
 
@@ -41,6 +46,7 @@ def sumatoria_reduce(n: int) -> int:
     """CHALLENGE OPCIONAL: Re-escribir utilizando reduce.
     Referencia: https://docs.python.org/3/library/functools.html#functools.reduce
     """
+    
     pass # Completar
 
 
