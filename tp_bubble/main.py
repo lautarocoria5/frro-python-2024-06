@@ -23,14 +23,20 @@ class RootWidget(FloatLayout):
 class ChatApp(App):
     def build(self):
         Builder.load_file('bubble.kv')
+        self.current_bubble = None  # Inicializar la variable current_bubble
         return RootWidget()
 
     def show_bubble(self, button, text_input):
+        if self.current_bubble is not None:
+            self.root.float_layout.remove_widget(self.current_bubble)
+            self.current_bubble = None
+
         # Agregar nueva burbuja sobre el botón "Emojis"
         bubble = CustomBubble(text_input)
         bubble.pos = (button.x, button.y + button.height)
         # Acceder al id float_layout directamente desde la instancia RootWidget
         self.root.float_layout.add_widget(bubble)
+        self.current_bubble = bubble
 
     def submit_message(self, text_input):
         print("Mensaje enviado:", text_input.text)

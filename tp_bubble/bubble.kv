@@ -2,6 +2,13 @@
     size_hint: None, None
     size: 100, 100
     arrow_pos: 'bottom_mid'
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 0.8  # Cambiar el valor de alfa a 1 para hacer el botón opaco
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [10,]
     BoxLayout:
         id: bubble_layout
         orientation: 'vertical'
@@ -9,6 +16,13 @@
 <RootWidget>:
     id: float_layout
     float_layout: float_layout  # Añadir una referencia a sí mismo para un acceso fácil
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1  # RGBA values for white
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
     BoxLayout:
         orientation: 'vertical'
         padding: 10
