@@ -1,0 +1,36 @@
+<CustomBubble>:
+    size_hint: None, None
+    size: 100, 100
+    arrow_pos: 'bottom_mid'
+    BoxLayout:
+        id: bubble_layout
+        orientation: 'vertical'
+
+<RootWidget>:
+    id: float_layout
+    float_layout: float_layout  # Añadir una referencia a sí mismo para un acceso fácil
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 10
+        spacing: 10
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: 40
+
+            Button:
+                text: 'Emojis'
+                size_hint_x: None
+                width: 80
+                on_release: app.show_bubble(self, message_input)
+
+            TextInput:
+                id: message_input
+                multiline: False
+
+        Button:
+            text: 'Enviar'
+            size_hint_y: None
+            height: 40
+            on_release: app.submit_message(message_input)
