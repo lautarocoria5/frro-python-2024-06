@@ -1,46 +1,29 @@
 from kivy.app import App
-from kivy.uix.bubble import Bubble, BubbleButton
+from kivy.uix.bubble import Bubble
 from kivy.uix.floatlayout import FloatLayout
+from kivy.properties import BooleanProperty
 from kivy.lang import Builder
 
 class CustomBubble(Bubble):
-    def __init__(self, text_input, **kwargs):
-        super().__init__(**kwargs)
-        self.text_input = text_input
-        for opc in [':D', ':|', ':(']:
-            btn = BubbleButton(text=opc)
-            btn.bind(on_release=self.on_option_select)
-            self.ids.bubble_layout.add_widget(btn)
+    visible = BooleanProperty(False) # Propiedad para controlar la visibilidad de bubble
 
-    def on_option_select(self, button):
-        self.text_input.text += button.text
-        # Ocultar la burbuja cuando se selecciona una opción
-        self.parent.remove_widget(self)
+    def on_visible(self, instance, value):
+        self.opacity = 1 if value else 0
+        self.disabled = not value
 
 class RootWidget(FloatLayout):
-    pass
+    def toggle_bubble_visibility(self, bubble):
+        bubble.visible = not bubble.visible # Cambiar la visibilidad de bubble
 
 class ChatApp(App):
     def build(self):
-        Builder.load_file('bubble.kv')
-        self.current_bubble = None  # Inicializar la variable current_bubble
+        # Builder.load_file('bubble.kv')
         return RootWidget()
-
-    def show_bubble(self, button, text_input):
-        if self.current_bubble is not None:
-            self.root.float_layout.remove_widget(self.current_bubble)
-            self.current_bubble = None
-
-        # Agregar nueva burbuja sobre el botón "Emojis"
-        bubble = CustomBubble(text_input)
-        bubble.pos = (button.x, button.y + button.height)
-        # Acceder al id float_layout directamente desde la instancia RootWidget
-        self.root.float_layout.add_widget(bubble)
-        self.current_bubble = bubble
 
     def submit_message(self, text_input):
         print("Mensaje enviado:", text_input.text)
         text_input.text = ''  # Limpiar el cuadro de texto después de enviar
 
 if __name__ == '__main__':
-    ChatApp().run()
+    Builder.load_file('bubble.kv')
+    ChatApp().run() 

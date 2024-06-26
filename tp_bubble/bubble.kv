@@ -1,10 +1,13 @@
 <CustomBubble>:
+    id: custom_bubble
     size_hint: None, None
     size: 100, 100
     arrow_pos: 'bottom_mid'
+    opacity: 0 # Inicialmente invisible
+    disabled: True # Inicialmente deshabilitado
     canvas.before:
         Color:
-            rgba: 0, 0, 0, 0.8
+            rgba: 0, 0, 0, 0.8 if self.opacity else 0
         RoundedRectangle:
             size: self.size
             pos: self.pos
@@ -12,6 +15,18 @@
     BoxLayout:
         id: bubble_layout
         orientation: 'vertical'
+        Button:
+            text: ':D'
+            on_release: app.insert_emoji(self.text, message_input)
+        Button:
+            text: 'XD'
+            on_release: app.insert_emoji(self.text, message_input)
+        Button:
+            text: ':P'
+            on_release: app.insert_emoji(self.text, message_input)
+        Button:
+            text: ':('
+            on_release: app.insert_emoji(self.text, message_input)
 
 <RootWidget>:
     id: float_layout
@@ -34,10 +49,12 @@
             height: 40
 
             Button:
+                id: emoji_button
                 text: 'Emojis'
                 size_hint_x: None
                 width: 80
                 on_release: app.show_bubble(self, message_input)
+                on_press: custom_bubble.opacity = 1 if custom_bubble.opacity == 0 else 0; custom_bubble.disabled = not custom_bubble.disabled
 
             TextInput:
                 id: message_input
