@@ -1,0 +1,128 @@
+from selenium import webdriver
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.firefox import GeckoDriverManager
+import pandas as pd
+
+# Configurar el servicio de GeckoDriver
+service = FirefoxService(executable_path=GeckoDriverManager().install())
+
+# Crear una instancia de Firefox con GeckoDriver
+options = webdriver.FirefoxOptions()
+options.add_argument('--headless')  # Ejecutar en modo headless (sin interfaz gráfica)
+driver = webdriver.Firefox(service=service, options=options)
+
+# URL de la página web de inmuebles en MercadoLibre
+base_url = 'https://inmuebles.mercadolibre.com.ar/departamentos/alquiler/santa-fe/rosario/'
+page = 1
+
+# Listas para almacenar los datos extraídos
+titles = []
+prices = []
+locations = []
+links = []
+ambientes = []
+banos = []
+metros_cuadrados = []
+
+try:
+    while True:
+        # Construir la URL de la página actual
+        if page == 1:
+            url = base_url
+        else:
+            url = f"{base_url}_Desde_{(page-1)*50 + 1}"  # Ajustar para la paginación de MercadoLibre
+        
+        driver.get(url)
+        
+        # Esperar a que los listados estén presentes en la página
+        WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'ui-search-result__wrapper')))
+        
+        # Encontrar los listados en la página actual
+        listings = driver.find_elements(By.CLASS_NAME, 'ui-search-result__wrapper')
+        
+        # Si no hay más listados, hemos llegado al final
+        if not listings:
+            break
+        
+        # Extraer los datos de los listados
+        for listing in listings:
+            try:
+                # Título
+                title_element = listing.find_element(By.CSS_SELECTOR, 'a.ui-search-link__title-card.ui-search-link h2.ui-search-item__title')
+                title = title_element.text
+
+                # Precio
+                price_element = listing.find_element(By.CSS_SELECTOR, '.ui-search-price .andes-money-amount__fraction')
+                price = price_element.text
+
+                # Ubicación
+                location_element = listing.find_element(By.CSS_SELECTOR, '.ui-search-item__location-container-grid .ui-search-item__location-label')
+                location = location_element.text
+
+                # Enlace
+                link_element = listing.find_element(By.CSS_SELECTOR, 'a.ui-search-link__title-card.ui-search-link')
+                link = link_element.get_attribute('href')
+
+                # Cantidad de ambientes
+                try:
+                    ambientes_element = listing.find_element(By.XPATH, './/li[contains(text(), "ambs.") or contains(text(), "amb.") or contains(text(), "ambiente") or contains(text(), "ambientes")]')
+                    ambientes_text = ambientes_element.text
+                    ambientes_value = ambientes_text.split(' ')[0] if ambientes_text else None
+                except Exception as e:
+                    ambientes_value = None
+
+                # Cantidad de baños
+                try:
+                    banos_element = listing.find_element(By.XPATH, './/li[contains(text(), "baño") or contains(text(), "baños")]')
+                    banos_text = banos_element.text
+                    banos_value = banos_text.split(' ')[0] if banos_text else None
+                except Exception as e:
+                    banos_value = None
+
+                # Metros cuadrados
+                try:
+                    metros_element = listing.find_element(By.XPATH, './/li[contains(text(), "m²")]')
+                    metros_text = metros_element.text
+                    metros_value = metros_text.split(' ')[0] if metros_text else None
+                except Exception as e:
+                    metros_value = None
+
+                # Guardar los datos
+                titles.append(title)
+                prices.append(price)
+                locations.append(location)
+                links.append(link)
+                ambientes.append(ambientes_value)
+                banos.append(banos_value)
+                metros_cuadrados.append(metros_value)
+
+            except Exception as e:
+                print(f'Error al extraer datos del listado: {e}')
+        
+        # Ir a la siguiente página
+        page += 1
+
+except Exception as e:
+    print(f'Error: {e}')
+finally:
+    # Cerrar el navegador
+    driver.quit()
+
+# Crear un DataFrame con los datos
+df = pd.DataFrame({
+    'Title': titles,
+    'Price': prices,
+    'Location': locations,
+    'Link': links,
+    'Ambientes': ambientes,
+    'Banos': banos,
+    'Metros Cuadrados': metros_cuadrados
+})
+
+# Guardar los datos en un archivo CSV
+df.to_csv('inmuebles.csv', index=False)
+
+print('Datos guardados en inmuebles.csv')

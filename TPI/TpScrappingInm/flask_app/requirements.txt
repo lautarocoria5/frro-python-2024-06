@@ -1,0 +1,5 @@
+Flask==2.2.5
+Flask-SQLAlchemy==2.5.1
+Flask-Migrate==3.0.1
+selenium==3.141.0
+webdriver_manager==3.4.2
