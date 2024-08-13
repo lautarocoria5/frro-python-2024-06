@@ -10,6 +10,14 @@ def suma_cubo_pares_for(numeros: Iterable[int]) -> int:
     Restricción: Utilizar dos bucles for, uno para elevar al cubo y otro para
     separar los pares.
     """
+    cubo = []
+    for n in numeros:
+        cubo.append(n*n*n)
+        suma = 0
+        for c in cubo:
+            if c%2 == 0:
+                suma += c
+    return suma
     pass # Completar
 
 
@@ -28,6 +36,7 @@ def suma_cubo_pares_sum_list(numeros: Iterable[int]) -> int:
     Referencia: https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions
     Referencia: https://docs.python.org/3/library/functions.html#sum
     """
+    return sum([x**3 for x in numeros if x**3 % 2 == 0])    
     pass # Completar
 
 
@@ -44,6 +53,7 @@ def suma_cubo_pares_sum_gen(numeros: Iterable[int]) -> int:
     y la función sum.
     Referencia: https://docs.python.org/3/reference/expressions.html#generator-expressions
     """
+    return sum(x**3 for x in numeros if x**3 % 2 == 0)
     pass # Completar
 
 
@@ -52,7 +62,7 @@ assert suma_cubo_pares_sum_gen([1, 2, 3, 4, 5, 6]) == 288
 # NO MODIFICAR - FIN
 
 
-###############################################################################
+############################################################################### 
 
 # PARTE 2
 # A continuación se introduce el concepto de Lambdas (Funciones anónimas),
@@ -64,25 +74,23 @@ numeros = [1, 2, 3, 4, 5, 6]
 
 # Escribir una función lambda que eleve los elementos al cubo
 
-numeros_al_cubo = # Completar
-
+numeros_al_cubo = list(map(lambda x: x**3, numeros))
 
 # Escribir una función lambda que permita filtrar todos los elementos pares
 
-numeros_al_cubo_pares = # Completar
+numeros_al_cubo_pares = list(filter(lambda x: x % 2 == 0, map(lambda x: x**3, numeros)))
 
-
-# Escribir una función Lambda que sume todos los elementos
+#Escribir una función Lambda que sume todos los elementos
 
 from functools import reduce
 
-suma_numeros_al_cubo_pares = # Completar
+suma_numeros_al_cubo_pares = sum(map(lambda x: x**3, filter(lambda x: x % 2 == 0, numeros)))
 
 
 # Escribir una función Lambda que permita ordenar los elementos de la numeros
 # en base a si son pares o impares
 
-numeros_ordenada = # Completar
+numeros_ordenada = sorted(numeros, key=lambda x: (x % 2 == 0, x))
 
 # NO MODIFICAR - INICIO
 assert numeros_al_cubo == [1, 8, 27, 64, 125, 216]

@@ -19,6 +19,11 @@ def combinar_basico(nombres: List[str], precios: List[float]) -> Tuple[Any]:
 
     Restricción: Resolver utilizando un bucle for.
     """
+    resultado = []
+    for i in range(len(nombres)):
+        resultado.append((nombres[i], precios[i]))
+    return tuple(resultado)
+
     pass # Completar
 
 
@@ -44,7 +49,12 @@ def combinar_enumerate(nombres: List[str], precios: List[float], ids: List[int])
     Referencia: https://docs.python.org/3/library/functions.html#enumerate
     """
     pass # Completar
+    resultado = []
+    for i, nombre in enumerate(nombres):
+        resultado.append((nombre, precios[i], ids[i]))
+    return tuple(resultado)
 
+    
 
 # NO MODIFICAR - INICIO
 respuesta = (
@@ -69,6 +79,10 @@ def combinar_zip(nombres: List[str], precios: List[float], ids: List[int]) -> Tu
     """
     pass # Completar
 
+    resultado = []
+    for nombre, precio, id_ in zip(nombres, precios, ids):
+        resultado.append((nombre, precio, id_))
+    return tuple(resultado)
 
 # NO MODIFICAR - INICIO
 respuesta = (
@@ -94,7 +108,7 @@ def combinar_zip_args(*args) -> Tuple[Any]:
     Referencia: https://docs.python.org/3/tutorial/controlflow.html#unpacking-argument-lists
     """
     pass # Completar
-
+    return tuple(zip(*args))
 
 # NO MODIFICAR - INICIO
 respuesta = (
