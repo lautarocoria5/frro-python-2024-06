@@ -8,11 +8,20 @@
 Los imports deben hacerse de forma tal que funcionen con el siguiente
 comando (estando parados dentro de la carpeta practico_02):
 $PATH$/practico_02> python -m source.ejercicio_02
+
 """
+import sys
+import os
+
+# Añadir el directorio raíz del proyecto a sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 # Completar
-
-
+import util
+import data.database as database
+from practico_02.config import test_config
+from practico_02.config.db_config import migrations
+from practico_02 import main
 # NO MODIFICAR - INICIO
 assert main.name == "main"
 assert util.name == "util"
