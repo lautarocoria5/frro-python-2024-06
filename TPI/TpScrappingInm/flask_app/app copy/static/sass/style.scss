@@ -1,0 +1,163 @@
+// Variables
+$primary-color: #4CAF50; // Color principal
+$secondary-color: #ffffff; // Color secundario (texto blanco)
+$background-color: #f4f4f9; // Color de fondo
+$table-header-color: #333; // Color de texto en la cabecera de la tabla
+$table-row-hover: #e8f5e9; // Color de fondo cuando se pasa el mouse sobre una fila
+$font-family: 'Poppins', sans-serif; // Fuente principal, más moderna y elegante
+$border-color: #ddd; // Color de borde de la tabla
+$shadow-color: rgba(0, 0, 0, 0.08); // Color de sombra más suave
+$input-background: #fff; // Fondo de los inputs
+$input-border-radius: 30px; // Bordes más redondeados para los inputs
+
+// General body styling
+body {
+    font-family: $font-family;
+    margin: 0;
+    padding: 0;
+    background-color: $background-color;
+    color: $table-header-color;
+    line-height: 1.6;
+}
+
+// Header
+header {
+    position: sticky;
+    text-align: center;
+    background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%)); // Gradiente sutil
+    padding: 1rem 1rem; // Reducción del padding superior e inferior
+    color: $secondary-color;
+    box-shadow: 0 6px 12px $shadow-color;
+
+    h1 {
+        margin: 0;
+        font-weight: 600; // Peso de fuente más fuerte para destacar
+        font-size: 3rem;
+        letter-spacing: 1.8px; // Mayor espaciado para un look limpio y moderno
+        text-transform: uppercase;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1); // Sombra sutil en el texto
+    }
+
+    .cantidad-inmuebles {
+        font-size: 1.5rem; // Tamaño de fuente más grande
+        color: $secondary-color; // Color del texto
+        font-weight: 600; // Peso de fuente más fuerte
+        text-align: center; // Centrar el texto
+        margin: 0; // Eliminar margen inferior
+        padding: 1rem; // Espaciado interno
+        border: 2px solid $primary-color; // Bordes alrededor del texto
+        border-radius: 10px; // Bordes redondeados
+        background-color: rgba(76, 175, 80, 0.1); // Color de fondo sutil
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Sombra suave
+    }
+}
+
+// Search Form
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin: 3rem 0;
+
+    .search-form {
+        display: flex;
+        gap: 1rem;
+        width: 100%;
+        max-width: 900px;
+
+        .search-input {
+            padding: 1rem;
+            font-size: 1.2rem;
+            border: 2px solid $primary-color;
+            border-radius: $input-border-radius;
+            width: 100%;
+            background-color: $input-background;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); // Sombra más suave
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+            &:focus {
+                border-color: darken($primary-color, 15%);
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+                outline: none;
+            }
+        }
+
+        .search-button {
+            padding: 0.75rem 2rem;
+            background-color: $primary-color;
+            color: $secondary-color;
+            border: none;
+            border-radius: $input-border-radius;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+            &:hover {
+                background-color: darken($primary-color, 10%);
+                transform: scale(1.05); // Efecto de elevación
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            }
+        }
+    }
+}
+
+// Table Styling
+.table-container {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+    //overflow-x: auto; // Para tablas grandes
+}
+
+.styled-table {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 1rem;
+    text-align: left;
+    box-shadow: 0 6px 12px $shadow-color;
+    border-radius: 10px; // Bordes redondeados en la tabla
+    overflow: hidden;
+
+    th, td {
+        padding: 1.25rem;
+        border: 1px solid $border-color;
+    }
+
+    thead {
+        background-color: $primary-color;
+        color: $secondary-color;
+        text-transform: uppercase;
+        font-weight: 600; // Peso fuerte en la cabecera
+        letter-spacing: 1.2px;
+        position: sticky; // Encabezado fijo
+        top: 0; // Se queda en la parte superior
+        z-index: 1; // Asegura que quede encima de las filas
+    }
+
+    tbody tr:nth-of-type(even) {
+        background-color: #fafafa;
+    }
+
+    tbody tr:last-of-type {
+        border-bottom: 2px solid $primary-color;
+    }
+
+    tbody tr:hover {
+        background-color: $table-row-hover;
+        transition: background-color 0.3s ease; // Transición suave al pasar el mouse
+    }
+
+    a {
+        color: $primary-color;
+        text-decoration: none;
+        font-weight: 500;
+
+        &:hover {
+            text-decoration: underline;
+            color: darken($primary-color, 15%);
+        }
+    }
+}

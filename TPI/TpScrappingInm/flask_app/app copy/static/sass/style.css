@@ -1,0 +1,132 @@
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+header {
+  position: sticky;
+  text-align: center;
+  background: linear-gradient(135deg, #4CAF50, #3d8b40);
+  padding: 1rem 1rem;
+  color: #ffffff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+header h1 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 3rem;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+header .cantidad-inmuebles {
+  font-size: 1.5rem;
+  color: #ffffff;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  padding: 1rem;
+  border: 2px solid #4CAF50;
+  border-radius: 10px;
+  background-color: rgba(76, 175, 80, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin: 3rem 0;
+}
+.search-container .search-form {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 900px;
+}
+.search-container .search-form .search-input {
+  padding: 1rem;
+  font-size: 1.2rem;
+  border: 2px solid #4CAF50;
+  border-radius: 30px;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.search-container .search-form .search-input:focus {
+  border-color: #357a38;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+  outline: none;
+}
+.search-container .search-form .search-button {
+  padding: 0.75rem 2rem;
+  background-color: #4CAF50;
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.search-container .search-form .search-button:hover {
+  background-color: #3d8b40;
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.table-container {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.styled-table {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 1rem;
+  text-align: left;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.styled-table th, .styled-table td {
+  padding: 1.25rem;
+  border: 1px solid #ddd;
+}
+.styled-table thead {
+  background-color: #4CAF50;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #fafafa;
+}
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #4CAF50;
+}
+.styled-table tbody tr:hover {
+  background-color: #e8f5e9;
+  transition: background-color 0.3s ease;
+}
+.styled-table a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-weight: 500;
+}
+.styled-table a:hover {
+  text-decoration: underline;
+  color: #357a38;
+}/*# sourceMappingURL=style.css.map */

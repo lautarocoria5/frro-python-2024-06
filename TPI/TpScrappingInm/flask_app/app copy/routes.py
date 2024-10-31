@@ -3,35 +3,69 @@ from flask import render_template, request, redirect, url_for
 from app.models import Inmueble
 from app import db
 import spacy
+import pandas as pd
 
 def setup_routes(app):
+    # Leer el CSV
+    inmuebles_df = pd.read_csv('./inmuebles.csv')  # Cambia esto por la ruta a tu CSV
+    inmuebles = inmuebles_df.to_dict(orient='records')  # Convertir el DataFrame a una lista de diccionarios
+    # # Cargar el modelo de lenguaje en español
+    # nlp = spacy.load("es_core_news_sm")
+
+    # @app.route('/')
+    # def index():
+    #     try:
+    #         inmuebles = Inmueble.query.all()
+    #         if not inmuebles:
+    #             print("No se encontraron inmuebles en la base de datos.")
+    #         return render_template('index.html', inmuebles=inmuebles)
+    #     except Exception as e:
+    #         import traceback
+    #         traceback.print_exc()  # Imprime el traceback completo del error
+    #         print(f"Ocurrió un error en la consulta: {e}")
+    #         return "Ocurrió un error al acceder a la base de datos."
+
+    # @app.route('/search', methods=['POST'])
+    # def search():
+    #     query = request.form.get('query')
+    #     if query:
+    #         results = search_inmuebles(query)
+    #         if not results:
+    #             mensaje = "No se encontraron departamentos con las especificaciones indicadas."
+    #         else:
+    #             mensaje = None
+    #         return render_template('index.html', inmuebles=results, mensaje=mensaje)
+    #     return redirect(url_for('index'))
+
     # Cargar el modelo de lenguaje en español
     nlp = spacy.load("es_core_news_sm")
 
     @app.route('/')
     def index():
         try:
-            inmuebles = Inmueble.query.all()
             if not inmuebles:
-                print("No se encontraron inmuebles en la base de datos.")
-            return render_template('index.html', inmuebles=inmuebles)
+                print("No se encontraron inmuebles en el archivo CSV.")
+            
+            cantidad_inmuebles = len(inmuebles)
+            return render_template('index.html', inmuebles=inmuebles, cantidad=cantidad_inmuebles)
         except Exception as e:
             import traceback
             traceback.print_exc()  # Imprime el traceback completo del error
-            print(f"Ocurrió un error en la consulta: {e}")
-            return "Ocurrió un error al acceder a la base de datos."
+            print(f"Ocurrió un error al leer el archivo CSV: {e}")
+            return "Ocurrió un error al acceder al archivo CSV."
 
     @app.route('/search', methods=['POST'])
     def search():
         query = request.form.get('query')
         if query:
-            results = search_inmuebles(query)
+            results, cantidad_inmuebles = search_inmuebles(query)
             if not results:
                 mensaje = "No se encontraron departamentos con las especificaciones indicadas."
             else:
                 mensaje = None
-            return render_template('index.html', inmuebles=results, mensaje=mensaje)
+            return render_template('index.html', inmuebles=results, mensaje=mensaje, cantidad=cantidad_inmuebles, query=query)  # Pasa el texto de búsqueda al template
         return redirect(url_for('index'))
+
 
     def search_inmuebles(query):
         # Procesar la consulta con spaCy
@@ -86,13 +120,16 @@ def setup_routes(app):
 
         # Manejo de ambientes y baños
         for token in doc:
+            print(f"Token: {token.text}, POS: {token.pos_}")
             if token.text in ["ambientes", "ambiente"] and token.nbor(-1).like_num:
                 num_ambientes = int(token.nbor(-1).text)
+                print(f"Ambientes detectados (anterior): {num_ambientes}")
             elif token.text in ["baños", "baño"] and token.nbor(-1).like_num:
                 num_banos = int(token.nbor(-1).text)
             elif token.text in ["ambientes", "ambiente"]:
                 if token.nbor(1).like_num:
                     num_ambientes = int(token.nbor(1).text)
+                    print(f"Ambientes detectados (siguiente): {num_ambientes}")
             elif token.text in ["baños", "baño"]:
                 if token.nbor(1).like_num:
                     num_banos = int(token.nbor(1).text)
@@ -110,25 +147,25 @@ def setup_routes(app):
         print(f"Palabras clave de ubicación: {location_keywords}")
 
         # Filtrar inmuebles
-        query_obj = Inmueble.query
+        results = inmuebles  # Comenzar con todos los inmuebles
         if price_max is not None:
-            query_obj = query_obj.filter(Inmueble.price <= price_max)
+            results = [inmueble for inmueble in results if inmueble['price'] <= price_max]
         if price_min is not None:
-            query_obj = query_obj.filter(Inmueble.price >= price_min)
+            results = [inmueble for inmueble in results if inmueble['price'] >= price_min]
         if num_ambientes is not None:
-            query_obj = query_obj.filter(Inmueble.ambientes == num_ambientes)
+            results = [inmueble for inmueble in results if inmueble['ambientes'] == num_ambientes]
         if num_banos is not None:
-            query_obj = query_obj.filter(Inmueble.banos == num_banos)
+            results = [inmueble for inmueble in results if inmueble['banos'] == num_banos]
         for keyword in location_keywords:
-            query_obj = query_obj.filter(Inmueble.location.ilike(f"%{keyword}%"))
-
-        results = query_obj.all()
-        return results
+            results = [inmueble for inmueble in results if keyword.lower() in inmueble['location'].lower()]
+       
+        cantidad_inmuebles = len(results)
+        return results, cantidad_inmuebles
 
     @app.route('/scrape', methods=['POST'])
     def scrape():
         try:
-            from app.scraping_script import scrape_inmuebles
+            from scraping_script import scrape_inmuebles
             scrape_inmuebles()
             # Confirmar que los datos fueron cargados
             inmuebles = Inmueble.query.all()

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inmuebles en Rosario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sass/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1>Lista de Inmuebles en Rosario</h1>
+        <p class="cantidad-inmuebles">{{cantidad }} inmuebles encontrados. </p>
+    </header>
+    <!-- Formulario de búsqueda -->
+    <div class="search-container">
+        <form action="{{ url_for('search') }}" method="post" class="search-form">
+            <input type="text" name="query" placeholder="Búsqueda inteligente..." class="search-input " value="{{ query }}">
+            <input type="submit" value="Buscar" class="search-button">
+        </form>
+    </div>
+
+
+    <!-- Mensaje cuando no se encuentran resultados -->
+    {% if mensaje %}
+    <div class="mensaje">
+        <p>{{ mensaje }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Tabla de inmuebles -->
+    <div class="table-container">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Precio</th>
+                    <th>Ubicación</th>
+                    <th>Ambientes</th>
+                    <th>Baños</th>
+                    <th>Metros Cuadrados</th>
+                    <th>Enlace</th>
+                    <th>Ver en el Mapa</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inmueble in inmuebles %}
+                <tr>
+                    <td>{{ inmueble.title }}</td>
+                    <td>{{ inmueble.price }}</td>
+                    <td>{{ inmueble.location }}</td>
+                    <td>{{ inmueble.ambientes }}</td>
+                    <td>{{ inmueble.banos }}</td>
+                    <td>{{ inmueble.metros_cuadrados }}</td>
+                    <td><a href="{{ inmueble.link }}" target="_blank">Ver</a></td>
+                    <td>
+                        {% if inmueble.location %}
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ inmueble.location.split(',')[0]|replace(' ', '+') }}+Rosario"
+                        target="_blank">Ver en el Mapa</a>
+                        {% else %}
+                        No disponible
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

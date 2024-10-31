@@ -6,6 +6,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.firefox import GeckoDriverManager
 from app import db, create_app
 from app.models import Inmueble
+import re
+from sqlalchemy.exc import IntegrityError
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+import logging
+import time
+
+# Configurar logging
+logging.basicConfig(level=logging.DEBUG)  # Cambia DEBUG a WARNING
+logging.getLogger("urllib3").setLevel(logging.WARNING)  # Cambia DEBUG a WARNING
 
 # Crear la aplicación y empujar el contexto de aplicación
 app = create_app()
@@ -26,87 +35,120 @@ with app.app_context():
 
     try:
         while True:
-            if page == 1:
-                url = base_url
-            else:
-                url = f"{base_url}_Desde_{(page-1)*50 + 1}"
+            url = base_url if page == 1 else f"{base_url}_Desde_{(page - 1) * 50 + 1}"
+            print(f"Accediendo a la URL: {url}")
 
             driver.get(url)
-            WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'ui-search-result__wrapper')))
-            listings = driver.find_elements(By.CLASS_NAME, 'ui-search-result__wrapper')
+            time.sleep(5)
+            try:
+                WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'ui-search-layout__item')))
+                #WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'li.ui-search-layout__item'))) ##li.ui-search-layout__item
+            except TimeoutException:
+                print("Timeout: No se encontraron elementos en el tiempo especificado.")
+                break
+
+            #listings = driver.find_elements(By.CSS_SELECTOR, 'li.ui-search-layout__item')
+            listings = driver.find_elements(By.CLASS_NAME, 'ui-search-layout__item')
 
             if not listings:
                 print("No se encontraron listados, se detiene la extracción.")
                 break
 
+            def clean_price(price_text):
+                """Limpia y convierte el texto del precio a float."""
+                if price_text:
+                    try:
+                        price_text = re.sub(r'[^\d,]', '', price_text)
+                        if ',' in price_text:
+                            price_text = price_text.replace('.', '').replace(',', '.')
+                        price_value = float(price_text)
+                        return price_value if price_value > 0 else None
+                    except ValueError as e:
+                        print(f"Error al convertir a float: '{price_text}': {e}")
+                        return None
+                return None
+
+            def extract_value(element, keyword):
+                """Extrae el valor correspondiente a un keyword del elemento."""
+                try:
+                    values = element.find_elements(By.CSS_SELECTOR, 'li.poly-attributes-list__item')
+                    value_text = next((el.text for el in values if keyword in el.text), None)
+                    return int(value_text.split(' ')[0]) if value_text else None
+                except Exception as e:
+                    print(f'Error al extraer {keyword}: {e}')
+                    return None
+
+            inmuebles_nuevos = []  # Lista para almacenar nuevos inmuebles
             for listing in listings:
                 try:
-                    title_element = listing.find_element(By.CSS_SELECTOR, 'a.ui-search-link__title-card.ui-search-link h2.ui-search-item__title')
+                    title_element = listing.find_element(By.CSS_SELECTOR, 'h2')
                     title = title_element.text
-                    price_element = listing.find_element(By.CSS_SELECTOR, '.ui-search-price .andes-money-amount__fraction')
-                    price = price_element.text
-                    location_element = listing.find_element(By.CSS_SELECTOR, '.ui-search-item__location-container-grid .ui-search-item__location-label')
+
+                    price_element = listing.find_element(By.CSS_SELECTOR, 'span.andes-money-amount__fraction')
+                    price_value = clean_price(price_element.text.strip() if price_element else None)
+
+                    location_element = listing.find_element(By.CSS_SELECTOR, 'span.poly-component__location')
                     location = location_element.text
-                    link_element = listing.find_element(By.CSS_SELECTOR, 'a.ui-search-link__title-card.ui-search-link')
+                    link_element = listing.find_element(By.CSS_SELECTOR, 'a')
                     link = link_element.get_attribute('href')
 
-                    # Depuración de precios
-                    print(f'Precio extraído: {price}')
+                    # Verificar si el inmueble ya existe en la base de datos por título y link
+                    if Inmueble.query.filter_by(title=title, link=link).first():
+                        print(f"Inmueble ya existe en la base de datos: {title}")
+                        continue  # Saltar este inmueble si ya existe
 
-                    try:
-                        ambientes_element = listing.find_element(By.XPATH, './/li[contains(text(), "ambs.") or contains(text(), "amb.") or contains(text(), "ambiente") or contains(text(), "ambientes")]')
-                        ambientes_text = ambientes_element.text
-                        ambientes_value = int(ambientes_text.split(' ')[0]) if ambientes_text else None
-                    except Exception:
-                        ambientes_value = None
+                    print(f'Título: {title}, Precio: {price_value}, Ubicación: {location}, Link: {link}')
 
-                    try:
-                        banos_element = listing.find_element(By.XPATH, './/li[contains(text(), "baño") or contains(text(), "baños")]')
-                        banos_text = banos_element.text
-                        banos_value = int(banos_text.split(' ')[0]) if banos_text else None
-                    except Exception:
-                        banos_value = None
+                    # Extraer ambientes
+                    ambientes_value = extract_value(listing, 'amb.')
+                    if ambientes_value is None:
+                        ambientes_value = 0  # Valor por defecto
 
-                    try:
-                        metros_element = listing.find_element(By.XPATH, './/li[contains(text(), "m²")]')
-                        metros_text = metros_element.text
-                        metros_value = float(metros_text.split(' ')[0].replace(',', '.')) if metros_text else None
-                    except Exception:
-                        metros_value = None
+                    # Extraer baños
+                    banos_value = extract_value(listing, 'baño')
+                    if banos_value is None:
+                        banos_value = 0  # Valor por defecto
 
-                    # Convertir el precio a float
-                    try:
-                        price_value = float(price.replace('.', '').replace(',', '.'))
-                    except ValueError:
-                        price_value = None  # Si el precio no es convertible, asignar None
+                    # Extraer metros cuadrados
+                    metros_element = listing.find_elements(By.CSS_SELECTOR, 'li.poly-attributes-list__item')
+                    metros_text = next((el.text for el in metros_element if 'm²' in el.text), None)
+                    metros_value = float(metros_text.split(' ')[0].replace(',', '.')) if metros_text else 0.0
 
-                    if price_value is not None:  # Solo agregar inmuebles con precios válidos
+                    # Solo agregar inmuebles con precios válidos
+                    if price_value is not None:
                         inmueble = Inmueble(
                             title=title,
                             price=price_value,
                             location=location,
-                            link=link,
                             ambientes=ambientes_value,
                             banos=banos_value,
-                            metros_cuadrados=metros_value
+                            metros_cuadrados=metros_value,
+                            link=link
                         )
+                        inmuebles_nuevos.append(inmueble)
 
-                        try:
-                            db.session.add(inmueble)
-                            db.session.commit()
-                            print(f'Agregado: {title} - ${price_value}')
-                        except Exception as e:
-                            db.session.rollback()
-                            print(f'Error al insertar registro: {e}')
-                    else:
-                        print(f'Precio inválido para el inmueble: {title}')
-                        
                 except Exception as e:
-                    print(f'Error al extraer datos del listado: {e}')
+                    print(f'Error al procesar el listado: {e}')
+
+            # Insertar nuevos inmuebles en la base de datos
+            if inmuebles_nuevos:
+                db.session.add_all(inmuebles_nuevos)
+                try:
+                    db.session.commit()
+                    print(f'{len(inmuebles_nuevos)} inmuebles guardados.')
+                except IntegrityError as e:
+                    print(f'Error de integridad: {e.orig}')
+                    db.session.rollback()
+                except Exception as e:
+                    print(f'Error al guardar los inmuebles: {e}')
+                    db.session.rollback()
 
             page += 1
 
     except Exception as e:
-        print(f'Error: {e}')
+        print(f'Error en el script principal: {e}')
+        import traceback
+        traceback.print_exc()
+
     finally:
         driver.quit()
