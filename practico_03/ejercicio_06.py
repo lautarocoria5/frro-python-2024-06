@@ -14,12 +14,21 @@ class Article:
     def __init__(self, name: str) -> None:
         self.name = name
 
-    # NO MODIFICAR - FIN
+    def __str__(self) -> str:
+        """Devuelve el nombre del artículo como una cadena."""
+        return self.name
 
-    # Completar
+    def __repr__(self) -> str:
+        """Devuelve la representación del artículo para reproducibilidad."""
+        return f"Article('{self.name}')"
+
+    def __eq__(self, other: object) -> bool:
+        """Compara dos artículos para ver si tienen el mismo nombre."""
+        if isinstance(other, Article):
+            return self.name == other.name
+        return False
 
 
-# NO MODIFICAR - INICIO
 class ShoppingCart:
     """Agregar los métodos que sean necesarios para que los test funcionen.
     Hint: los métodos necesarios son todos magic methods
@@ -32,19 +41,32 @@ class ShoppingCart:
         else:
             self.articles = articles
 
+    def __str__(self) -> str:
+        """Devuelve la lista de artículos como una cadena."""
+        return str([str(article) for article in self.articles])
+
+    def __repr__(self) -> str:
+        """Devuelve una representación del carrito para su reproducibilidad."""
+        return f"ShoppingCart({repr(self.articles)})"
+
+    def __eq__(self, other: object) -> bool:
+        """Compara dos carritos de compras verificando si contienen los mismos artículos, sin importar el orden."""
+        if isinstance(other, ShoppingCart):
+            return sorted(self.articles, key=lambda x: x.name) == sorted(other.articles, key=lambda x: x.name)
+        return False
+
+    def __add__(self, other: ShoppingCart) -> ShoppingCart:
+        """Permite sumar dos carritos de compras (combinar sus artículos)."""
+        if isinstance(other, ShoppingCart):
+            return ShoppingCart(self.articles + other.articles)
+        return self
+
     def add(self, article: Article) -> ShoppingCart:
         self.articles.append(article)
         return self
 
     def remove(self, remove_article: Article) -> ShoppingCart:
-        new_articles = []
-
-        for article in self.articles:
-            if article != remove_article:
-                new_articles.append(article)
-
-        self.articles = new_articles
-
+        self.articles = [article for article in self.articles if article != remove_article]
         return self
 
     # NO MODIFICAR - FIN
