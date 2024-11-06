@@ -28,18 +28,11 @@ def actualizar_precio(articulos: List[Articulo], porcentaje: float) -> List[Arti
     articulos_copiados = deepcopy(articulos)
     
     for articulo in articulos_copiados:
-        # Actualizamos el precio sumando el porcentaje
         precio_viejo = articulo.precio
         articulo.precio = precio_viejo * (1 + porcentaje / 100)
-        ##decimales_viejos = contar_decimales(precio_viejo)
-        ##articulo.precio = round(articulo.precio, decimales_viejos)
         print(f"Articulo: {articulo.nombre} | Precio Viejo: {precio_viejo} | Precio Nuevo: {articulo.precio}")
         print(f"| precio nuevo calculado: {precio_viejo*(1+porcentaje/100)}")
     return articulos_copiados
-
-        
-
-
 
 # NO MODIFICAR - INICIO
 nombres = ["sabana", "parlante", "computadora", "tasa", "botella", "celular"]
