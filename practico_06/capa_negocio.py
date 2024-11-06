@@ -1,5 +1,13 @@
 # Implementar los metodos de la capa de negocio de socios.
 
+# Añadir el directorio padre al sys.path
+import sys
+import os
+
+# Añadir el directorio raíz del proyecto al sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Importar módulos de practico_05
 from practico_05.ejercicio_01 import Socio
 from practico_05.ejercicio_02 import DatosSocio
 
@@ -31,7 +39,7 @@ class NegocioSocio(object):
         Devuelve None si no encuentra nada.
         :rtype: Socio
         """
-        return
+        return self.datos.buscar(id_socio)
 
     def buscar_dni(self, dni_socio):
         """
@@ -39,14 +47,14 @@ class NegocioSocio(object):
         Devuelve None si no encuentra nada.
         :rtype: Socio
         """
-        return
+        return self.datos.buscar_dni(dni_socio)
 
     def todos(self):
         """
         Devuelve listado de todos los socios.
         :rtype: list
         """
-        return []
+        return self.datos.todos()
 
     def alta(self, socio):
         """
@@ -57,7 +65,16 @@ class NegocioSocio(object):
         :type socio: Socio
         :rtype: bool
         """
-        return False
+        if not self.regla_1(socio):
+            raise DniRepetido(f"El DNI {socio.dni} ya está registrado.")
+        
+        if not self.regla_2(socio):
+            raise LongitudInvalida(f"El nombre y apellido deben tener entre {self.MIN_CARACTERES} y {self.MAX_CARACTERES} caracteres.")
+        
+        if not self.regla_3():
+            raise MaximoAlcanzado(f"El número máximo de socios ({self.MAX_SOCIOS}) ha sido alcanzado.")
+
+        return self.datos.alta(socio) is not None
 
     def baja(self, id_socio):
         """
@@ -65,7 +82,7 @@ class NegocioSocio(object):
         Devuelve True si el borrado fue exitoso.
         :rtype: bool
         """
-        return False
+        return self.datos.baja(id_socio)
 
     def modificacion(self, socio):
         """
@@ -76,7 +93,10 @@ class NegocioSocio(object):
         :type socio: Socio
         :rtype: bool
         """
-        return False
+        if not self.regla_2(socio):
+            raise LongitudInvalida(f"El nombre y apellido deben tener entre {self.MIN_CARACTERES} y {self.MAX_CARACTERES} caracteres.")
+        
+        return self.datos.modificacion(socio) is not None
 
     def regla_1(self, socio):
         """
@@ -85,7 +105,8 @@ class NegocioSocio(object):
         :raise: DniRepetido
         :return: bool
         """
-        return False
+        existing_socio = self.datos.buscar_dni(socio.dni)
+        return existing_socio is None
 
     def regla_2(self, socio):
         """
@@ -94,7 +115,8 @@ class NegocioSocio(object):
         :raise: LongitudInvalida
         :return: bool
         """
-        return False
+        return (self.MIN_CARACTERES <= len(socio.nombre) <= self.MAX_CARACTERES and
+                self.MIN_CARACTERES <= len(socio.apellido) <= self.MAX_CARACTERES)
 
     def regla_3(self):
         """
@@ -102,4 +124,4 @@ class NegocioSocio(object):
         :raise: MaximoAlcanzado
         :return: bool
         """
-        return False
+        return self.datos.contarSocios() < self.MAX_SOCIOS

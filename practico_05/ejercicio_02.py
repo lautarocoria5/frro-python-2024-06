@@ -1,8 +1,14 @@
 """Base de Datos - ORM"""
 
+import sys
+import os
+
+# Añadir el directorio raíz del proyecto para que practico_05 sea accesible
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from ejercicio_01 import Base, Socio
+from practico_05.ejercicio_01 import Base, Socio
 from typing import List, Optional
 
 class DatosSocio():
