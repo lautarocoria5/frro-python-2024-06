@@ -11,22 +11,25 @@ class Auto:
     
     Referencia: https://docs.python.org/3/library/functions.html#property"""
 
-    # Completar
+
     def __init__(self, nombre: str, precio: float):
         self._precio = precio
         self._marca = nombre
-    
+
     @property
     def precio(self):
+        # Redondear el precio a 2 decimales cuando se obtiene
         return round(self._precio, 2)
-    
+
     @property
     def nombre(self):
-        return self.nombre.capitalize()
-    
+        # Retornar la marca capitalizada
+        return self._marca.capitalize()
+
     @precio.setter
-    def precio(self, value:float):
-        self._precio = value
+    def precio(self, value: float):
+        # Redondear el valor del precio antes de asignarlo
+        self._precio = round(value, 2)
         
 
 
@@ -56,22 +59,30 @@ from dataclasses import dataclass
 class Auto:
     """Re-Escribir utilizando DataClasses"""
 
-    # Completar
-    precio: float
-    nombre: str
+    # Atributos de la clase
+    _precio: float
+    _nombre: str
 
+    # Constructor __init__ para inicializar los valores
+    def __init__(self, nombre: str, precio: float):
+        self._precio = round(precio, 2)  # Redondear precio al crear la instancia
+        self._nombre = nombre.capitalize()  # Capitalizar el nombre al crear la instancia
+
+    # Propiedad para el precio
     @property
     def precio(self):
-        return round(self._precio, 2)
-    
+        return self._precio
+
+    # Propiedad para el nombre (solo getter, no setter)
     @property
     def nombre(self):
-        return self.nombre.capitalize()
-    
+        return self._nombre
+
+    # Setter para el precio
     @precio.setter
-    def precio(self, value:float):
-        self._precio = value
-        
+    def precio(self, value: float):
+        self._precio = round(value, 2)
+
 # NO MODIFICAR - INICIO
 auto = Auto("Ford", 12_875.456)
 
